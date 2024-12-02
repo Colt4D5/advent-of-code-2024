@@ -4,7 +4,7 @@ import fs from 'fs';
 const columns = {
   one: [],
   two: [],
-  differences: [],
+  similarityScore: 0,
 }
 
 // read lines
@@ -16,17 +16,20 @@ const lines = readline.createInterface({
 // create sortable columns 
 for await (const line of lines) {
   const values = line.split('   ');
-  columns.one.push(values[0]);
-  columns.two.push(values[1]);
+  columns.one.push(+values[0]);
+  columns.two.push(+values[1]);
 }
 
-// sort columns
-columns.one = columns.one.sort((a, b) => +a - +b);
-columns.two = columns.two.sort((a, b) => +a - +b);
-
-// calculate sorted differences
 for (let i = 0; i < columns.one.length; i++) {
-  columns.differences.push(Math.abs(+columns.one[i] - +columns.two[i]));
+  const currId = columns.one[i];
+  let count = 0;
+  for (let j = 0; j < columns.two.length; j++) {
+    const currSecondId = columns.two[j];
+    if (currId === currSecondId) {
+      count++
+    }
+  }
+  columns.similarityScore += currId * count;
 }
 
-console.log(columns.differences.reduce((prev, curr) => prev + curr));
+console.log(columns.similarityScore);
