@@ -4,7 +4,6 @@ import fs from 'fs';
 const columns = {
   one: [],
   two: [],
-  differences: [],
 }
 
 // read lines
@@ -16,17 +15,15 @@ const lines = readline.createInterface({
 // create sortable columns 
 for await (const line of lines) {
   const values = line.split('   ');
-  columns.one.push(values[0]);
-  columns.two.push(values[1]);
+  columns.one.push(+values[0]);
+  columns.two.push(+values[1]);
 }
 
 // sort columns
-columns.one = columns.one.sort((a, b) => +a - +b);
-columns.two = columns.two.sort((a, b) => +a - +b);
+columns.two = columns.two.sort((a, b) => a - b);
 
-// calculate sorted differences
-for (let i = 0; i < columns.one.length; i++) {
-  columns.differences.push(Math.abs(+columns.one[i] - +columns.two[i]));
-}
-
-console.log(columns.differences.reduce((prev, curr) => prev + curr));
+let index = 0;
+const score = columns.one.sort((a, b) => a - b).reduce((prev, curr) => {
+  index++;
+  return prev + Math.abs(curr - columns.two[index - 1]);
+}, 0);

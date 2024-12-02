@@ -31,5 +31,3 @@ for (let i = 0; i < columns.one.length; i++) {
   }
   columns.similarityScore += currId * count;
 }
-
-console.log(columns.similarityScore);
