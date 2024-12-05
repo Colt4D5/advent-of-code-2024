@@ -71,3 +71,51 @@ function challengeOne() {
 }
 
 challengeOne();
+
+function challengeTwo() {
+  const firstLetterCoords = [];
+  for (const [row, rowVal] of Object.entries(matrix)) {
+    for (const [col, letter] of Object.entries(rowVal)) {
+      if (letter === 'A') {
+        firstLetterCoords.push([row, col]);
+      }
+    }
+  }
+
+  let xmasInstances = 0;
+
+  for (const [startRow, startCol] of firstLetterCoords) {
+    const topLeft = [-1, -1];
+    const topRight = [-1, 1];
+    const bottomLeft = [1, -1];
+    const bottomRight = [1, 1];
+    const currentRow = startRow;
+    const currentCol = startCol;
+
+    
+    if (
+      currentRow < 1 || 
+      currentRow > matrix.length - 2 || 
+      currentCol < 1 || 
+      currentCol > matrix[startRow].length - 2
+    ) {
+      //do nothing
+    } else {
+      const topLeftChar = matrix[currentRow - topLeft[0]][currentCol - topLeft[1]];
+      const bottomRightChar = matrix[currentRow - bottomRight[0]][currentCol - bottomRight[1]];
+      const topRightChar = matrix[currentRow - topRight[0]][currentCol - topRight[1]];
+      const bottomLeftChar = matrix[currentRow - bottomLeft[0]][currentCol - bottomLeft[1]];
+  
+      // console.log([topLeftChar, bottomRightChar], [topRightChar, bottomLeftChar], [topRightChar, bottomLeftChar], [topLeftChar, bottomRightChar]);
+      if (([topLeftChar, bottomRightChar].includes('M') && [topLeftChar, bottomRightChar].includes('S')) && ([topRightChar, bottomLeftChar].includes('M') && [topRightChar, bottomLeftChar].includes('S'))) {
+        xmasInstances++;
+      }
+    }
+    
+
+  }
+
+  console.log("Challenge 2: " + xmasInstances);
+}
+
+challengeTwo();
