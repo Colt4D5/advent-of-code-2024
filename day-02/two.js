@@ -1,51 +1,76 @@
-import readline from 'readline';
-import fs from 'fs';
+import { readFileSync } from 'fs';
 
-let safeReports = 0;
+const filePath = './data.txt';
+// const filePath = './data-test.txt';
+// const filePath = './data-test-2.txt';
 
-// read lines
-const reports = readline.createInterface({
-    input: fs.createReadStream('test-data.txt'),
-    crlfDelay: Infinity,
-});
+const data = readFileSync(filePath, { encoding: 'utf8', flag: 'r' })
+  .split('\n')
+  .map(line => line.split(' ').map(Number));
 
-// create sortable columns 
-for await (const report of reports) {
-  const reportValues = report.split(' ').map(Number);
+let safeCount = 0;
+
+
+for (const line of data) {
+  const isIncreasing = line[line.length - 1] > line[0];
   let isSafe = true;
-  let lastReport = null;
-  let invalidCount = 0;
-  let isIncreasingReports = isIncreasing(reportValues[0], reportValues[1]);
-  console.log('___________________');
+  let lastReport = line[0];
 
-  for (const report of reportValues) {
-    if (lastReport) {
-      // console.log(
-      //   'report = lastReport: ' + (report === lastReport),
-      //   '| isIncreasing() != isIncreasingReports: ' + (isIncreasing(lastReport, report) !== isIncreasingReports),
-      //   '| !isWithinRange(): ' + !isWithinRange(report, lastReport));
-      if (
-        report === lastReport ||
-        isIncreasing(lastReport, report) !== isIncreasingReports ||
-        !isWithinRange(lastReport, report)) {
-          invalidCount++;
-      }
+  for (let i = 1; i < line.length; i++) {
+    if (
+      line[i] === lastReport ||
+      Math.abs(line[i] - lastReport) > 3 ||
+      isIncreasing !== line[i] > lastReport
+    ) {
+      isSafe = false;
     }
-    lastReport = report;
+
+    lastReport = line[i];
   }
-  console.log(invalidCount);
-  isSafe = invalidCount <= 1;
-  if (isSafe) safeReports++;
+
+  if (isSafe) {
+    safeCount++;
+  } else {
+    const isValid = recheckReports(line);
+    if (isValid) {
+      safeCount++;
+    }
+  }
 }
 
-console.log('*******************');
-console.log(safeReports);
-console.log('*******************');
+console.log(safeCount);
 
-function isIncreasing(report1, report2) {
-  return report1 > report2
+function recheckReports(line) {
+  let newLine = line;
+  let safeResults = [];
+
+  for (let i = 0; i < line.length; i++) {
+    newLine = [...line];
+    newLine.splice(i, 1);
+
+    const isSafe = checkReport(newLine);
+    safeResults.push(isSafe);
+  }
+
+  return safeResults.some(safe => safe);
 }
 
-function isWithinRange(report1, report2) {
-  return Math.abs(report1 - report2) <= 3
+function checkReport(line) {
+  const isIncreasing = line[line.length - 1] > line[0];
+  let isSafe = true;
+  let lastReport = line[0];
+
+  for (let i = 1; i < line.length; i++) {
+    if (
+      line[i] === lastReport ||
+      Math.abs(line[i] - lastReport) > 3 ||
+      isIncreasing !== line[i] > lastReport
+    ) {
+      isSafe = false;
+    }
+
+    lastReport = line[i];
+  }
+
+  return isSafe;
 }
